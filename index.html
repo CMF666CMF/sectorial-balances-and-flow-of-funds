@@ -901,10 +901,10 @@ const datiReali = {
     nota: "Passaggio da fragile posizione esterna a surplus privato robusto. Il deficit pubblico primario resta contenuto entro il 3%."
   },
   "USA": {
-    CA:  { 2007: -5.0, 2010: -3.0, 2015: -2.4, 2020: -3.2, 2025: -3.6 },
-    Pub: { 2007: -3.5, 2010: -8.7, 2015: -3.0, 2020: -8.4, 2025: -7.5 },
+    CA:  { 2007: -5.1, 2010: -2.9, 2015: -2.2, 2020: -2.8, 2025: -3.6 },
+    Pub: { 2007: -1.1, 2010: -8.6, 2015: -2.4, 2020: -14.7, 2025: -5.9 },
     color: "#e05252",
-    nota: "Deficit gemelli persistenti. Il settore privato è tornato in surplus dopo il deleveraging 2008–2012, ma il deficit pubblico è esploso."
+    nota: "Deficit gemelli persistenti. Il settore privato è tornato in surplus dopo il deleveraging 2008–2012, ma il deficit pubblico è esploso. Dati 2007-2020 da OMB; 2025 da Tesoro USA."
   },
   "Lussemburgo": {
     CA:  { 2007:  9.0, 2010:  5.5, 2015:  4.7, 2020:  4.9, 2025:  4.3 },
@@ -958,9 +958,6 @@ function getPub(p, a) { return interpReale(datiReali[p].Pub, a); }
 function getPriv(p, a){ return getCA(p, a) - getPub(p, a); }
 
 // ==================== STATO ISOLAMENTO ====================
-// Set di paesi isolati. Se vuoto → tutti visibili.
-// Se non vuoto → solo quelli nel set sono visibili (highlighted),
-// gli altri sono dimmed.
 const isolatedSet = new Set();
 
 // ==================== SETUP SVG ====================
@@ -1136,7 +1133,6 @@ Object.keys(datiReali).forEach(paese => {
     ca: 0, pub: 0
   };
 
-  // Click: isola singolo | Ctrl/Cmd+click: toggle nel set
   const onClick = (e) => {
     e.stopPropagation();
     if (e.ctrlKey || e.metaKey) {
@@ -1242,7 +1238,6 @@ function applyVisibility() {
     const isIsolated = isolatedSet.has(p);
 
     if (!hasIsolation) {
-      // Nessuna isolazione: tutti visibili
       sel.classed("dimmed", false).classed("highlighted", false);
       sel.style("pointer-events", null);
     } else if (isIsolated) {
@@ -1253,12 +1248,10 @@ function applyVisibility() {
       sel.style("pointer-events", "none");
     }
 
-    // Sidebar
     d3.select(`.legend-item[data-paese="${p}"]`)
       .classed("isolated", isIsolated);
   });
 
-  // Badge
   const badge = d3.select("#isolationBadge");
   if (hasIsolation) {
     badge.classed("active", true);
@@ -1274,7 +1267,6 @@ function applyVisibility() {
 }
 
 function isolaSingolo(paese) {
-  // Se è già l'unico isolato → reset
   if (isolatedSet.size === 1 && isolatedSet.has(paese)) {
     resetIsolamento();
     return;
@@ -1298,7 +1290,6 @@ function resetIsolamento() {
   applyVisibility();
 }
 
-// Esponi globalmente per il bottone HTML
 window.resetIsolamento = resetIsolamento;
 
 // ==================== AGGIORNAMENTO ====================
@@ -1318,7 +1309,6 @@ function updateSidebar(anno) {
 }
 
 function updateStats(anno) {
-  // Media calcolata solo sui paesi isolati (o tutti se nessuno isolato)
   const attivi = isolatedSet.size > 0
     ? Array.from(isolatedSet)
     : Object.keys(datiReali);
@@ -1337,7 +1327,7 @@ function updateStats(anno) {
   d3.select("#statEst").text(fmt(sumEst)).style("color", col(sumEst));
 }
 
-// ✅ ANIMAZIONE CORRETTA
+// ANIMAZIONE
 function updateFrame(anno, { animate = false, progress = true } = {}) {
   d3.select("#annoDisplay").text(anno);
   d3.select("#slider").property("value", anno);
@@ -1353,7 +1343,6 @@ function updateFrame(anno, { animate = false, progress = true } = {}) {
     const gr = gruppi[paese];
     gr.ca = ca; gr.pub = pub;
 
-    // Traiettoria progressiva
     const puntiTraccia = [];
     for (let a = ANNO_INI; a <= anno; a++) {
       puntiTraccia.push([getCA(paese, a), getPub(paese, a)]);
