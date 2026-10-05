@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saldi Settoriali e Flussi di Fondi · 2007–2025</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep: #0a0e1a;
+    --bg-panel: #121826;
+    --bg-elev: #1a2233;
+    --border: #2a3448;
+    --text-primary: #e8eef7;
+    --text-secondary: #8fa3c0;
+    --text-muted: #5a6b85;
+    --accent-gold: #d4a843;
+    --accent-red: #e05252;
+    --accent-green: #4db87a;
+    --accent-blue: #5b9bd5;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 28px 24px;
+    font-feature-settings: 'tnum' 1, 'cv11' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1600px; margin: 0 auto; }
+
+  /* ============ HEADER ============ */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-left h1 {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 5px;
+  }
+  .header-left .sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .header-right {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+  }
+  .header-right strong { color: var(--accent-gold); font-weight: 600; }
+
+  /* ============ BADGE ISOLAMENTO ============ */
+  .isolation-badge {
+    display: none;
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    background: rgba(212,168,67,0.1);
+    border: 1px solid var(--accent-gold);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--accent-gold);
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .isolation-badge.active { display: flex; }
+  .isolation-badge .chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .isolation-badge .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .isolation-badge .chip .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .isolation-badge button {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .isolation-badge button:hover {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+  }
+
+  /* ============ LAYOUT ============ */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1200px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-elev);
+  }
+  .panel-header h2 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+  }
+  .panel-header .hint {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .panel-body { padding: 16px; }
+
+  /* ============ CONTROLS ============ */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+  }
+  .btn {
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover:not(:disabled) {
+    background: var(--bg-elev);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+  }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn.primary {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+    border-color: var(--accent-gold);
+  }
+  .btn.primary:hover:not(:disabled) {
+    background: #e5b954;
+    border-color: #e5b954;
+  }
+  .btn.icon { padding: 7px 10px; font-size: 14px; }
+
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 200px;
+  }
+  .slider-wrap label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(212,168,67,0.7);
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    cursor: pointer;
+    border: none;
+  }
+
+  .anno-display {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    letter-spacing: 1px;
+    min-width: 55px;
+    text-align: right;
+  }
+
+  /* ============ PROGRESS BAR ============ */
+  .progress-container {
+    padding: 0 18px 10px;
+    background: var(--bg-elev);
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold));
+    width: 0%;
+    transition: width 0.2s linear;
+    box-shadow: 0 0 8px var(--accent-gold);
+  }
+
+  /* ============ CHART ============ */
+  #chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--bg-panel);
+  }
+
+  /* ============ LEGEND ============ */
+  .legend-item {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    margin-bottom: 3px;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    user-select: none;
+  }
+  .legend-item:hover {
+    background: var(--bg-elev);
+    border-color: var(--border);
+  }
+  .legend-item.hidden { opacity: 0.25; }
+  .legend-item.isolated {
+    background: rgba(212,168,67,0.08);
+    border-color: var(--accent-gold);
+  }
+  .legend-item.isolated::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 60%;
+    background: var(--accent-gold);
+    border-radius: 2px;
+  }
+  .legend-swatch {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    position: relative;
+  }
+  .legend-swatch::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    box-shadow: 0 0 10px currentColor;
+    opacity: 0.6;
+  }
+  .legend-name {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .legend-name .name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-values {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+  }
+  .legend-values .val-pos { color: var(--accent-green); }
+  .legend-values .val-neg { color: var(--accent-red); }
+  .legend-values .val-priv {
+    color: var(--accent-gold);
+    font-weight: 700;
+  }
+
+  /* ============ SPARKLINE ============ */
+  .sparkline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+
+  /* ============ INFO BOX ============ */
+  .formula-box {
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--bg-elev);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .formula-box .formula {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 12px;
+    color: var(--accent-gold);
+    font-weight: 600;
+    margin: 6px 0;
+    display: block;
+  }
+  .formula-box strong { color: var(--text-primary); }
+
+  .kbd-hint {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(91,155,213,0.06);
+    border-radius: 6px;
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .kbd-hint kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin: 0 2px;
+  }
+  .kbd-hint .highlight {
+    color: var(--accent-gold);
+    font-weight: 600;
+  }
+
+  /* ============ STATS BAR ============ */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .stat-cell {
+    background: var(--bg-elev);
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .stat-value {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  /* ============ TOOLTIP ============ */
+  .tooltip {
+    position: absolute;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    z-index: 1000;
+    min-width: 220px;
+  }
+  .tooltip-header {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tooltip-year {
+    font-family: 'SF Mono', monospace;
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 4px 0;
+    font-size: 11px;
+  }
+  .tooltip-row .label { color: var(--text-secondary); }
+  .tooltip-row .value {
+    font-family: 'SF Mono', monospace;
+    font-weight: 700;
+  }
+  .tooltip-row.highlight {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ============ CONFRONTO ============ */
+  .confronto-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    margin-bottom: 5px;
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+  }
+  .confronto-country {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .confronto-country .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .confronto-arrow {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .confronto-values {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .confronto-val {
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    min-width: 42px;
+    text-align: center;
+  }
+  .confronto-val.pos { color: var(--accent-green); }
+  .confronto-val.neg { color: var(--accent-red); }
+  .confronto-delta {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'SF Mono', monospace;
+  }
+
+  /* ============ DATA TABLE ============ */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 7px 9px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .data-table td {
+    padding: 6px 9px;
+    border-bottom: 1px solid rgba(42,52,72,0.5);
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    transition: background 0.2s;
+  }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .data-table tr.active-year td {
+    background: rgba(212,168,67,0.08);
+    color: var(--text-primary);
+  }
+  .data-table .country-cell {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .data-table .country-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .data-table .v-pos { color: var(--accent-green); }
+  .data-table .v-neg { color: var(--accent-red); }
+
+  /* ============ AUTHORS ============ */
+  .authors-box {
+    margin-top: 32px;
+    padding: 24px 28px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .authors-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-gold), transparent 70%);
+  }
+  .authors-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-gold);
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .authors-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .authors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px 24px;
+  }
+  .author-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .author-row:hover {
+    background: rgba(212,168,67,0.06);
+    border-left-color: var(--accent-gold);
+  }
+  .author-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.2px;
+  }
+  .author-matricola {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--accent-gold);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .authors-footer {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .authors-footer strong { color: var(--text-secondary); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+  }
+
+  /* ============ SVG STYLES ============ */
+  .axis-line { stroke: rgba(143,163,192,0.35); stroke-width: 1; }
+  .grid-line { stroke: rgba(143,163,192,0.06); stroke-width: 1; }
+  .grid-line.major { stroke: rgba(143,163,192,0.12); }
+  .axis-text { fill: var(--text-muted); font-size: 11px; font-family: 'SF Mono', monospace; }
+  .axis-title {
+    fill: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .bisector {
+    stroke: var(--accent-gold);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+    opacity: 0.55;
+  }
+  .quadrant-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    opacity: 0.5;
+  }
+  .paese-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    paint-order: stroke;
+    stroke: var(--bg-panel);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .traccia {
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .triangolo {
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    cursor: pointer;
+  }
+  .punto {
+    stroke: var(--bg-panel);
+    stroke-width: 2;
+    cursor: pointer;
+  }
+  .punto-halo {
+    fill: none;
+    stroke-width: 1;
+    cursor: pointer;
+  }
+  .comet {
+    pointer-events: none;
+  }
+  .paese-grp { transition: opacity 0.4s ease; }
+  .paese-grp.dimmed { opacity: 0.06; pointer-events: none; }
+  .paese-grp.highlighted { opacity: 1; }
+  .pulse-ring {
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-left">
+      <h1>Saldi Settoriali e Flussi di Fondi</h1>
+      <div class="sub">Evoluzione macroeconomica 2007 – 2025 · Analisi comparata di sei economie</div>
+    </div>
+    <div class="header-right">
+      <strong>Identità contabile:</strong> (S − I) ≡ (T − G − TR) + CA<br>
+      <strong>Unità di misura:</strong> % del PIL<br>
+      <strong>Fonti:</strong> Eurostat · OECD · IMF WEO
+    </div>
+  </header>
+
+  <div class="isolation-badge" id="isolationBadge">
+    <span style="font-weight:600;">Paesi isolati:</span>
+    <span class="chips" id="isoChips"></span>
+    <button onclick="resetIsolamento()">Mostra tutti</button>
+  </div>
+
+  <div class="layout">
+
+    <!-- ============ CHART PANEL ============ -->
+    <div class="panel">
+      <div class="controls">
+        <button id="playBtn" class="btn primary">▶ Play</button>
+        <button id="pauseBtn" class="btn" disabled>❚❚ Pausa</button>
+        <button id="resetBtn" class="btn icon" title="Reset">↺</button>
+        <button id="prevBtn" class="btn icon" title="Anno precedente">◀</button>
+        <button id="nextBtn" class="btn icon" title="Anno successivo">▶</button>
+        <div class="slider-wrap">
+          <label>Anno</label>
+          <input type="range" id="slider" min="2007" max="2025" value="2007" step="1">
+        </div>
+        <div class="anno-display" id="annoDisplay">2007</div>
+        <button id="exportBtn" class="btn icon" title="Esporta SVG">⤓</button>
+      </div>
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <svg id="chart" viewBox="0 0 960 720" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <div class="stats-bar">
+        <div class="stat-cell">
+          <div class="stat-label">Media privato (S−I)</div>
+          <div class="stat-value" id="statPriv">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Media pubblico</div>
+          <div class="stat-value" id="statPub">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Media estero (CA)</div>
+          <div class="stat-value" id="statEst">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Paesi</h2>
+        <span class="hint">click = isola · <strong style="color:var(--accent-gold)">Ctrl+click</strong> = multi</span>
+      </div>
+      <div class="panel-body" style="padding: 10px;">
+        <div id="paesiList"></div>
+
+        <div class="formula-box">
+          <strong>Lettura del diagramma</strong>
+          <span class="formula">S − I = CA − Pub</span>
+          La <strong>bisettrice</strong> rappresenta il pareggio del settore privato <em>(S = I)</em>.
+          La <strong>distanza verticale</strong> tra punto e bisettrice è pari al saldo privato.<br><br>
+          <strong>Sotto</strong> → surplus privato.<br>
+          <strong>Sopra</strong> → deficit privato.
+        </div>
+
+        <div class="kbd-hint">
+          <strong>Scorciatoie:</strong><br>
+          <kbd>Spazio</kbd> Play/Pausa · <kbd>R</kbd> Reset<br>
+          <kbd>←</kbd> <kbd>→</kbd> Cambia anno · <kbd>Esc</kbd> Reset isolamento<br>
+          <span class="highlight">Ctrl/Cmd + click</span> = isolamento multiplo
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ CONFRONTO 2007 vs 2025 ============ -->
+  <div class="panel" style="margin-top: 20px;">
+    <div class="panel-header">
+      <h2>Confronto 2007 → 2025 · saldo privato (S − I)</h2>
+      <span class="hint">variazione in punti percentuali di PIL</span>
+    </div>
+    <div class="panel-body" style="padding: 12px;">
+      <div id="confrontoList"></div>
+    </div>
+  </div>
+
+  <!-- ============ DATA TABLE ============ -->
+  <div class="panel" style="margin-top: 20px;">
+    <div class="panel-header">
+      <h2>Dati agli anchor points · 2007 · 2010 · 2015 · 2020 · 2025</h2>
+      <span class="hint">% del PIL</span>
+    </div>
+    <div class="panel-body" style="padding: 6px 12px 12px;">
+      <table class="data-table" id="dataTable"></table>
+    </div>
+  </div>
+
+  <!-- ============ AUTHORS ============ -->
+  <div class="authors-box">
+    <div class="authors-title">Gruppo di lavoro</div>
+    <div class="authors-grid">
+      <div class="author-row">
+        <span class="author-name">Ciro Chierchia</span>
+        <span class="author-matricola">DB4000214</span>
+      </div>
+      <div class="author-row">
+        <span class="author-name">Alessandro de Franchis</span>
+        <span class="author-matricola">DB4000257</span>
+      </div>
+      <div class="author-row">
+        <span class="author-name">Domenico Di Francesco</span>
+        <span class="author-matricola">DB4000025</span>
+      </div>
+      <div class="author-row">
+        <span class="author-name">Lorenzo Colonna</span>
+        <span class="author-matricola">DB4000258</span>
+      </div>
+      <div class="author-row">
+        <span class="author-name">Alessia Ferrara</span>
+        <span class="author-matricola">DB4000377</span>
+      </div>
+      <div class="author-row">
+        <span class="author-name">Cristiana Benucci</span>
+        <span class="author-matricola">DB4000097</span>
+      </div>
+    </div>
+    <div class="authors-footer">
+      <span><strong>Corso:</strong> Macroeconomia · CLEA A-K · a.a. 2026/2027</span>
+      <span><strong>Elaborazione:</strong> D3.js · dati Eurostat · OECD · IMF WEO</span>
+    </div>
+  </div>
+
+  <footer>
+    Rappresentazione grafica dei saldi settoriali e flussi di fondi · Valori a 5 anchor points · 2007–2025
+  </footer>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ==================== DATI A 5 ANCHOR POINTS ====================
+const anchorYears = [2007, 2010, 2015, 2020, 2025];
+
+const datiReali = {
+  "Italia": {
+    CA:  { 2007: -1.5, 2010: -3.4, 2015:  1.6, 2020:  3.9, 2025:  1.2 },
+    Pub: { 2007: -1.5, 2010: -3.6, 2015: -2.6, 2020: -6.1, 2025: -3.1 },
+    color: "#5b9bd5",
+    nota: "Passaggio da fragile posizione esterna a surplus privato robusto. Il deficit pubblico primario resta contenuto entro il 3%."
+  },
+  "USA": {
+    CA:  { 2007: -5.0, 2010: -3.0, 2015: -2.4, 2020: -3.2, 2025: -3.6 },
+    Pub: { 2007: -3.5, 2010: -8.7, 2015: -3.0, 2020: -8.4, 2025: -7.5 },
+    color: "#e05252",
+    nota: "Deficit gemelli persistenti. Il settore privato è tornato in surplus dopo il deleveraging 2008–2012, ma il deficit pubblico è esploso."
+  },
+  "Lussemburgo": {
+    CA:  { 2007:  9.0, 2010:  5.5, 2015:  4.7, 2020:  4.9, 2025:  4.3 },
+    Pub: { 2007:  4.0, 2010:  1.5, 2015:  0.8, 2020: -1.5, 2025: -1.0 },
+    color: "#b197fc",
+    nota: "Hub contabile e finanziario. Il surplus estero riflette i flussi delle multinazionali e dei fondi di investimento, non la produzione reale."
+  },
+  "Norvegia": {
+    CA:  { 2007: 13.5, 2010: 12.3, 2015:  8.5, 2020:  2.1, 2025: 14.8 },
+    Pub: { 2007: 17.3, 2010: 11.0, 2015:  5.9, 2020: -1.8, 2025: 12.0 },
+    color: "#4db87a",
+    nota: "Fondo sovrano (Government Pension Fund Global). Surplus estero strutturale legato alle materie prime energetiche."
+  },
+  "Irlanda": {
+    CA:  { 2007: -6.5, 2010: -1.2, 2015:  4.2, 2020:  4.4, 2025:  8.2 },
+    Pub: { 2007:  0.0, 2010: -9.9, 2015: -1.7, 2020: -5.0, 2025:  1.8 },
+    color: "#e8a33d",
+    nota: "Hub contabile. Il rimbalzo è dovuto in gran parte alle multinazionali (pharma, tech) che spostano utili e proprietà intellettuale in Irlanda."
+  },
+  "Cina": {
+    CA:  { 2007: 10.1, 2010:  4.0, 2015:  2.7, 2020:  1.7, 2025:  3.3 },
+    Pub: { 2007:  1.0, 2010: -2.3, 2015: -3.4, 2020: -6.2, 2025: -8.7 },
+    color: "#e07be0",
+    nota: "Risparmio interno elevato. Il surplus estero si è ridotto per transizione verso consumi interni e tensioni commerciali; il deficit pubblico è cresciuto."
+  }
+};
+
+const anni = d3.range(2007, 2026);
+const ANNO_INI = 2007, ANNO_FIN = 2025;
+
+// Interpolazione a anchor points
+function interpReale(valori, anno) {
+  const punti = Object.entries(valori)
+    .map(([a, v]) => ({ anno: +a, val: v }))
+    .sort((a, b) => a.anno - b.anno);
+
+  if (anno <= punti[0].anno) return punti[0].val;
+  if (anno >= punti[punti.length - 1].anno) return punti[punti.length - 1].val;
+
+  for (let i = 0; i < punti.length - 1; i++) {
+    if (anno >= punti[i].anno && anno <= punti[i + 1].anno) {
+      const t = (anno - punti[i].anno) / (punti[i + 1].anno - punti[i].anno);
+      return punti[i].val + t * (punti[i + 1].val - punti[i].val);
+    }
+  }
+  return 0;
+}
+
+function getCA(p, a)  { return interpReale(datiReali[p].CA, a); }
+function getPub(p, a) { return interpReale(datiReali[p].Pub, a); }
+function getPriv(p, a){ return getCA(p, a) - getPub(p, a); }
+
+// ==================== STATO ISOLAMENTO ====================
+// Set di paesi isolati. Se vuoto → tutti visibili.
+// Se non vuoto → solo quelli nel set sono visibili (highlighted),
+// gli altri sono dimmed.
+const isolatedSet = new Set();
+
+// ==================== SETUP SVG ====================
+const width = 960, height = 720;
+const margin = { top: 50, right: 50, bottom: 75, left: 85 };
+const innerW = width - margin.left - margin.right;
+const innerH = height - margin.top - margin.bottom;
+
+const svg = d3.select("#chart");
+const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+const xScale = d3.scaleLinear().domain([-12, 20]).range([0, innerW]);
+const yScale = d3.scaleLinear().domain([-12, 20]).range([innerH, 0]);
+
+// --- Sfondo ---
+g.append("rect")
+  .attr("width", innerW).attr("height", innerH)
+  .attr("fill", "rgba(255,255,255,0.012)")
+  .attr("rx", 4);
+
+// --- Zone colorate ---
+g.append("polygon")
+  .attr("points", () => {
+    const p1 = [xScale(-12), yScale(-12)];
+    const p2 = [xScale(20), yScale(20)];
+    const p3 = [xScale(20), yScale(-12)];
+    return [p1, p2, p3].map(p => p.join(",")).join(" ");
+  })
+  .attr("fill", "#e05252").attr("opacity", 0.055);
+
+g.append("polygon")
+  .attr("points", () => {
+    const p1 = [xScale(-12), yScale(-12)];
+    const p2 = [xScale(20), yScale(20)];
+    const p3 = [xScale(-12), yScale(20)];
+    return [p1, p2, p3].map(p => p.join(",")).join(" ");
+  })
+  .attr("fill", "#d4a843").attr("opacity", 0.055);
+
+// --- Griglia ---
+const xTicks = d3.range(-10, 21, 5);
+const yTicks = d3.range(-10, 21, 5);
+g.selectAll(".grid-x").data(xTicks).enter().append("line")
+  .attr("class", d => d === 0 ? "grid-line major" : "grid-line")
+  .attr("x1", d => xScale(d)).attr("x2", d => xScale(d))
+  .attr("y1", 0).attr("y2", innerH);
+g.selectAll(".grid-y").data(yTicks).enter().append("line")
+  .attr("class", d => d === 0 ? "grid-line major" : "grid-line")
+  .attr("x1", 0).attr("x2", innerW)
+  .attr("y1", d => yScale(d)).attr("y2", d => yScale(d));
+
+// --- Assi ---
+g.append("line").attr("class", "axis-line")
+  .attr("x1", 0).attr("y1", yScale(0))
+  .attr("x2", innerW).attr("y2", yScale(0));
+g.append("line").attr("class", "axis-line")
+  .attr("x1", xScale(0)).attr("y1", 0)
+  .attr("x2", xScale(0)).attr("y2", innerH);
+
+// --- Bisettrice S = I ---
+g.append("line").attr("class", "bisector")
+  .attr("x1", xScale(-12)).attr("y1", yScale(-12))
+  .attr("x2", xScale(20)).attr("y2", yScale(20));
+
+g.append("text")
+  .attr("x", xScale(17)).attr("y", yScale(17) - 12)
+  .attr("font-size", 13).attr("font-style", "italic")
+  .attr("fill", "#d4a843").attr("font-weight", 700)
+  .attr("opacity", 0.75)
+  .text("S = I");
+
+// --- Etichette quadranti ---
+const quadLabels = [
+  { x: xScale(19), y: yScale(19),   text: "AVANZO ESTERO · AVANZO PUBBLICO", color: "#4db87a", anchor: "end" },
+  { x: xScale(-11), y: yScale(19),   text: "DISAVANZO ESTERO · AVANZO PUBBLICO", color: "#8fa3c0", anchor: "start" },
+  { x: xScale(-11), y: yScale(-11),  text: "DISAVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e05252", anchor: "start" },
+  { x: xScale(19), y: yScale(-11),  text: "AVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e8a33d", anchor: "end" }
+];
+quadLabels.forEach(q => {
+  g.append("text")
+    .attr("x", q.x).attr("y", q.y)
+    .attr("class", "quadrant-label")
+    .attr("fill", q.color)
+    .attr("text-anchor", q.anchor)
+    .text(q.text);
+});
+
+// --- Etichette assi ---
+g.append("text")
+  .attr("x", innerW / 2).attr("y", innerH + 52)
+  .attr("text-anchor", "middle").attr("class", "axis-title")
+  .text("Saldo estero corrente (CA = NX + RNE) — % del PIL");
+
+g.append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("x", -innerH / 2).attr("y", -62)
+  .attr("text-anchor", "middle").attr("class", "axis-title")
+  .text("Saldo pubblico primario (T − G − TR) — % del PIL");
+
+// --- Tick assi ---
+const xAxis = g.append("g")
+  .attr("transform", `translate(0,${yScale(0)})`)
+  .call(d3.axisBottom(xScale).ticks(8).tickFormat(d => d + "%").tickSize(4));
+xAxis.selectAll("text").attr("class", "axis-text").attr("dy", "1.2em");
+xAxis.selectAll("line").attr("stroke", "rgba(143,163,192,0.35)");
+xAxis.select(".domain").remove();
+
+const yAxis = g.append("g")
+  .attr("transform", `translate(${xScale(0)},0)`)
+  .call(d3.axisLeft(yScale).ticks(8).tickFormat(d => d + "%").tickSize(4));
+yAxis.selectAll("text").attr("class", "axis-text").attr("dx", "-0.5em");
+yAxis.selectAll("line").attr("stroke", "rgba(143,163,192,0.35)");
+yAxis.select(".domain").remove();
+
+// ==================== GRUPPI PAESI ====================
+const gruppi = {};
+const DURATION = 600;
+
+Object.keys(datiReali).forEach(paese => {
+  const gr = g.append("g")
+    .attr("class", "paese-grp")
+    .attr("data-paese", paese);
+
+  const triangolo = gr.append("polygon")
+    .attr("class", "triangolo")
+    .attr("fill", datiReali[paese].color)
+    .attr("stroke", datiReali[paese].color)
+    .attr("fill-opacity", 0.18);
+
+  const traccia = gr.append("path")
+    .attr("class", "traccia")
+    .attr("stroke", datiReali[paese].color)
+    .attr("opacity", 0.55);
+
+  const comet = gr.append("circle")
+    .attr("class", "comet")
+    .attr("r", 16)
+    .attr("fill", "none")
+    .attr("stroke", datiReali[paese].color)
+    .attr("stroke-width", 1)
+    .attr("opacity", 0)
+    .style("filter", "blur(2px)");
+
+  const pulseRing = gr.append("circle")
+    .attr("class", "pulse-ring")
+    .attr("r", 8)
+    .attr("fill", "none")
+    .attr("stroke", datiReali[paese].color)
+    .attr("stroke-width", 1.5)
+    .attr("opacity", 0);
+
+  const halo = gr.append("circle")
+    .attr("class", "punto-halo")
+    .attr("r", 14)
+    .attr("fill", "none")
+    .attr("stroke", datiReali[paese].color)
+    .attr("stroke-opacity", 0.4);
+
+  const punto = gr.append("circle")
+    .attr("class", "punto")
+    .attr("r", 8)
+    .attr("fill", datiReali[paese].color)
+    .style("filter", `drop-shadow(0 0 8px ${datiReali[paese].color})`);
+
+  const label = gr.append("text")
+    .attr("class", "paese-label")
+    .attr("fill", datiReali[paese].color)
+    .attr("dx", 15).attr("dy", -10)
+    .text(paese);
+
+  gruppi[paese] = {
+    gr, triangolo, traccia, comet, pulseRing, punto, halo, label,
+    ca: 0, pub: 0
+  };
+
+  // Click: isola singolo | Ctrl/Cmd+click: toggle nel set
+  const onClick = (e) => {
+    e.stopPropagation();
+    if (e.ctrlKey || e.metaKey) {
+      toggleMulti(paese);
+    } else {
+      isolaSingolo(paese);
+    }
+  };
+  const onDblClick = (e) => {
+    e.stopPropagation();
+    resetIsolamento();
+  };
+  [triangolo, punto, halo].forEach(el => {
+    el.on("click", onClick).on("dblclick", onDblClick);
+  });
+});
+
+// ==================== TOOLTIP ====================
+const tooltip = d3.select("#tooltip");
+function showTooltip(event, paese, anno) {
+  const ca = getCA(paese, anno);
+  const pub = getPub(paese, anno);
+  const priv = getPriv(paese, anno);
+  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+  const col = v => v >= 0 ? '#4db87a' : '#e05252';
+
+  tooltip.html(`
+    <div class="tooltip-header" style="color:${datiReali[paese].color}">
+      <span>${paese}</span>
+      <span class="tooltip-year">${anno}</span>
+    </div>
+    <div class="tooltip-row">
+      <span class="label">Saldo estero (CA)</span>
+      <span class="value" style="color:${col(ca)}">${fmt(ca)}</span>
+    </div>
+    <div class="tooltip-row">
+      <span class="label">Saldo pubblico</span>
+      <span class="value" style="color:${col(pub)}">${fmt(pub)}</span>
+    </div>
+    <div class="tooltip-row highlight">
+      <span class="label">Saldo privato (S−I)</span>
+      <span class="value" style="color:${col(priv)}">${fmt(priv)}</span>
+    </div>
+  `)
+  .style("left", Math.min(event.pageX + 16, window.innerWidth - 260) + "px")
+  .style("top", (event.pageY - 20) + "px")
+  .style("opacity", 1);
+}
+function hideTooltip() { tooltip.style("opacity", 0); }
+
+// ==================== SIDEBAR ====================
+const paesiList = d3.select("#paesiList");
+
+function buildSparkline(paese) {
+  const w = 40, h = 12;
+  const vals = anni.map(a => getPriv(paese, a));
+  const xS = d3.scaleLinear().domain([0, vals.length - 1]).range([0, w]);
+  const yMin = d3.min(vals), yMax = d3.max(vals);
+  const yS = d3.scaleLinear().domain([yMin, yMax]).range([h, 0]);
+  const path = vals.map((v, i) => `${i === 0 ? 'M' : 'L'}${xS(i)},${yS(v)}`).join(' ');
+  return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <path d="${path}" fill="none" stroke="${datiReali[paese].color}" stroke-width="1.2" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+Object.keys(datiReali).forEach(paese => {
+  const row = paesiList.append("div")
+    .attr("class", "legend-item")
+    .attr("data-paese", paese);
+
+  row.append("div")
+    .attr("class", "legend-swatch")
+    .style("background", datiReali[paese].color)
+    .style("color", datiReali[paese].color);
+
+  const nameDiv = row.append("div").attr("class", "legend-name");
+  nameDiv.html(`<div class="name-row">
+    <span>${paese}</span>
+    ${buildSparkline(paese)}
+  </div>`);
+
+  row.append("div")
+    .attr("class", "legend-values")
+    .attr("id", `val-${paese.replace(/\s/g,'')}`);
+
+  row.on("click", (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      toggleMulti(paese);
+    } else {
+      isolaSingolo(paese);
+    }
+  });
+  row.on("dblclick", () => resetIsolamento());
+});
+
+// ==================== ISOLAMENTO MULTIPLO ====================
+function applyVisibility() {
+  const hasIsolation = isolatedSet.size > 0;
+
+  Object.keys(gruppi).forEach(p => {
+    const gr = gruppi[p];
+    const sel = d3.select(`.paese-grp[data-paese="${p}"]`);
+    const isIsolated = isolatedSet.has(p);
+
+    if (!hasIsolation) {
+      // Nessuna isolazione: tutti visibili
+      sel.classed("dimmed", false).classed("highlighted", false);
+      sel.style("pointer-events", null);
+    } else if (isIsolated) {
+      sel.classed("dimmed", false).classed("highlighted", true);
+      sel.style("pointer-events", null);
+    } else {
+      sel.classed("dimmed", true).classed("highlighted", false);
+      sel.style("pointer-events", "none");
+    }
+
+    // Sidebar
+    d3.select(`.legend-item[data-paese="${p}"]`)
+      .classed("isolated", isIsolated);
+  });
+
+  // Badge
+  const badge = d3.select("#isolationBadge");
+  if (hasIsolation) {
+    badge.classed("active", true);
+    const chips = d3.select("#isoChips");
+    chips.html("");
+    Array.from(isolatedSet).forEach(p => {
+      chips.append("span").attr("class", "chip")
+        .html(`<span class="dot" style="background:${datiReali[p].color};color:${datiReali[p].color}"></span>${p}`);
+    });
+  } else {
+    badge.classed("active", false);
+  }
+}
+
+function isolaSingolo(paese) {
+  // Se è già l'unico isolato → reset
+  if (isolatedSet.size === 1 && isolatedSet.has(paese)) {
+    resetIsolamento();
+    return;
+  }
+  isolatedSet.clear();
+  isolatedSet.add(paese);
+  applyVisibility();
+}
+
+function toggleMulti(paese) {
+  if (isolatedSet.has(paese)) {
+    isolatedSet.delete(paese);
+  } else {
+    isolatedSet.add(paese);
+  }
+  applyVisibility();
+}
+
+function resetIsolamento() {
+  isolatedSet.clear();
+  applyVisibility();
+}
+
+// Esponi globalmente per il bottone HTML
+window.resetIsolamento = resetIsolamento;
+
+// ==================== AGGIORNAMENTO ====================
+function updateSidebar(anno) {
+  Object.keys(datiReali).forEach(paese => {
+    const ca = getCA(paese, anno);
+    const pub = getPub(paese, anno);
+    const priv = getPriv(paese, anno);
+    const cls = v => v >= 0 ? 'val-pos' : 'val-neg';
+    const sign = v => (v >= 0 ? '+' : '') + v.toFixed(1);
+    d3.select(`#val-${paese.replace(/\s/g,'')}`).html(`
+      CA <span class="${cls(ca)}">${sign(ca)}</span> ·
+      Pub <span class="${cls(pub)}">${sign(pub)}</span><br>
+      <span class="val-priv">S−I ${sign(priv)}</span>
+    `);
+  });
+}
+
+function updateStats(anno) {
+  // Media calcolata solo sui paesi isolati (o tutti se nessuno isolato)
+  const attivi = isolatedSet.size > 0
+    ? Array.from(isolatedSet)
+    : Object.keys(datiReali);
+
+  let sumPriv = 0, sumPub = 0, sumEst = 0;
+  attivi.forEach(p => {
+    sumPriv += getPriv(p, anno);
+    sumPub += getPub(p, anno);
+    sumEst += getCA(p, anno);
+  });
+  const n = attivi.length;
+  const fmt = v => (v >= 0 ? '+' : '') + (v / n).toFixed(1) + '%';
+  const col = v => v >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+  d3.select("#statPriv").text(fmt(sumPriv)).style("color", col(sumPriv));
+  d3.select("#statPub").text(fmt(sumPub)).style("color", col(sumPub));
+  d3.select("#statEst").text(fmt(sumEst)).style("color", col(sumEst));
+}
+
+// ✅ ANIMAZIONE CORRETTA
+function updateFrame(anno, { animate = false, progress = true } = {}) {
+  d3.select("#annoDisplay").text(anno);
+  d3.select("#slider").property("value", anno);
+
+  if (progress) {
+    const pct = ((anno - ANNO_INI) / (ANNO_FIN - ANNO_INI)) * 100;
+    d3.select("#progressFill").style("width", pct + "%");
+  }
+
+  Object.keys(datiReali).forEach(paese => {
+    const ca = getCA(paese, anno);
+    const pub = getPub(paese, anno);
+    const gr = gruppi[paese];
+    gr.ca = ca; gr.pub = pub;
+
+    // Traiettoria progressiva
+    const puntiTraccia = [];
+    for (let a = ANNO_INI; a <= anno; a++) {
+      puntiTraccia.push([getCA(paese, a), getPub(paese, a)]);
+    }
+    const lineGen = d3.line()
+      .x(d => xScale(d[0]))
+      .y(d => yScale(d[1]))
+      .curve(d3.curveMonotoneX);
+    gr.traccia.attr("d", lineGen(puntiTraccia));
+
+    const A = [xScale(ca), yScale(pub)];
+    const B = [xScale(ca), yScale(ca)];
+    const C = [xScale(pub), yScale(pub)];
+    const triPoints = [A, B, C].map(p => p.join(",")).join(" ");
+
+    if (animate) {
+      gr.punto.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.halo.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.comet.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.pulseRing.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.label.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("x", xScale(ca)).attr("y", yScale(pub));
+      gr.triangolo.transition().duration(DURATION).ease(d3.easeCubicOut)
+        .attr("points", triPoints);
+    } else {
+      gr.punto.attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.halo.attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.comet.attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.pulseRing.attr("cx", xScale(ca)).attr("cy", yScale(pub));
+      gr.label.attr("x", xScale(ca)).attr("y", yScale(pub));
+      gr.triangolo.attr("points", triPoints);
+    }
+  });
+
+  updateSidebar(anno);
+  updateStats(anno);
+  highlightTableYear(anno);
+}
+
+// ==================== TABELLA ====================
+function buildDataTable() {
+  const table = d3.select("#dataTable");
+  const paesi = Object.keys(datiReali);
+
+  const thead = table.append("thead");
+  const headerRow = thead.append("tr");
+  headerRow.append("th").text("Paese");
+  anchorYears.forEach(anno => {
+    headerRow.append("th").attr("colspan", 3).text(anno)
+      .attr("data-anno", anno)
+      .style("text-align", "center");
+  });
+
+  const subRow = thead.append("tr");
+  subRow.append("th").text("");
+  anchorYears.forEach(() => {
+    subRow.append("th").text("CA").style("text-align", "right");
+    subRow.append("th").text("Pub").style("text-align", "right");
+    subRow.append("th").text("S−I").style("text-align", "right");
+  });
+
+  const tbody = table.append("tbody");
+  paesi.forEach(paese => {
+    const row = tbody.append("tr").attr("data-paese", paese);
+    const cc = row.append("td").attr("class", "country-cell");
+    cc.append("span").attr("class", "country-dot")
+      .style("background", datiReali[paese].color);
+    cc.append("span").text(paese);
+
+    anchorYears.forEach(anno => {
+      const ca = getCA(paese, anno);
+      const pub = getPub(paese, anno);
+      const priv = getPriv(paese, anno);
+      const cls = v => v >= 0 ? "v-pos" : "v-neg";
+      const fmt = v => (v >= 0 ? "+" : "") + v.toFixed(1);
+      row.append("td").attr("class", cls(ca) + " col-" + anno).text(fmt(ca));
+      row.append("td").attr("class", cls(pub) + " col-" + anno).text(fmt(pub));
+      row.append("td").attr("class", cls(priv) + " col-" + anno)
+        .style("font-weight", "700").text(fmt(priv));
+    });
+  });
+}
+
+function highlightTableYear(anno) {
+  d3.selectAll(".data-table th").classed("active-year", false);
+  d3.selectAll(".data-table th[data-anno]").classed("active-year", function() {
+    return +this.getAttribute("data-anno") === anno;
+  });
+  d3.selectAll(".data-table td").classed("active-year", false);
+  d3.selectAll(`.data-table .col-${anno}`).classed("active-year", true);
+}
+
+// ==================== CONFRONTO ====================
+function buildConfronto() {
+  const list = d3.select("#confrontoList");
+  Object.keys(datiReali).forEach(paese => {
+    const p2007 = getPriv(paese, 2007);
+    const p2025 = getPriv(paese, 2025);
+    const delta = p2025 - p2007;
+    const cls = v => v >= 0 ? "pos" : "neg";
+    const sign = v => (v >= 0 ? "+" : "") + v.toFixed(1);
+
+    const row = list.append("div").attr("class", "confronto-row")
+      .attr("data-paese", paese);
+    row.append("div").attr("class", "confronto-country")
+      .html(`<span class="dot" style="background:${datiReali[paese].color}"></span>${paese}`);
+    row.append("div").attr("class", "confronto-arrow").text("→");
+    row.append("div").attr("class", "confronto-values")
+      .html(`
+        <span class="confronto-val ${cls(p2007)}">${sign(p2007)}</span>
+        <span class="confronto-delta">Δ ${sign(delta)}</span>
+        <span class="confronto-val ${cls(p2025)}">${sign(p2025)}</span>
+      `);
+  });
+}
+
+// ==================== CONTROLLI ====================
+let currentFrame = 0;
+let timer = null;
+const FPS = 6;
+
+function play() {
+  if (timer) return;
+  d3.select("#playBtn").attr("disabled", true);
+  d3.select("#pauseBtn").attr("disabled", null);
+
+  if (currentFrame >= anni.length - 1) {
+    currentFrame = 0;
+    Object.keys(gruppi).forEach(p => {
+      gruppi[p].traccia.attr("d", null);
+    });
+  }
+
+  Object.keys(gruppi).forEach(p => {
+    gruppi[p].pulseRing.attr("opacity", 0.6);
+  });
+
+  timer = setInterval(() => {
+    if (currentFrame >= anni.length - 1) { pause(); return; }
+    currentFrame++;
+    updateFrame(anni[currentFrame], { animate: true, progress: true });
+  }, 1000 / FPS);
+}
+
+function pause() {
+  if (timer) { clearInterval(timer); timer = null; }
+  d3.select("#playBtn").attr("disabled", null);
+  d3.select("#pauseBtn").attr("disabled", true);
+  Object.keys(gruppi).forEach(p => {
+    gruppi[p].pulseRing.attr("opacity", 0);
+  });
+}
+
+function goToAnno(anno, animate = false) {
+  currentFrame = Math.max(0, Math.min(anni.length - 1, anni.indexOf(anno)));
+  updateFrame(anno, { animate, progress: true });
+}
+
+function reset() {
+  pause();
+  currentFrame = 0;
+  Object.keys(gruppi).forEach(p => {
+    gruppi[p].traccia.attr("d", null);
+    gruppi[p].pulseRing.attr("opacity", 0);
+  });
+  updateFrame(ANNO_INI, { animate: false, progress: true });
+  resetIsolamento();
+}
+
+d3.select("#playBtn").on("click", play);
+d3.select("#pauseBtn").on("click", pause);
+d3.select("#resetBtn").on("click", reset);
+d3.select("#prevBtn").on("click", () => {
+  pause();
+  goToAnno(anni[Math.max(0, currentFrame - 1)]);
+});
+d3.select("#nextBtn").on("click", () => {
+  pause();
+  goToAnno(anni[Math.min(anni.length - 1, currentFrame + 1)]);
+});
+
+d3.select("#slider").on("input", function() {
+  pause();
+  goToAnno(+this.value, false);
+});
+
+d3.select("#exportBtn").on("click", () => {
+  const svgEl = document.getElementById("chart");
+  const serializer = new XMLSerializer();
+  let source = serializer.serializeToString(svgEl);
+  source = '<?xml version="1.0" standalone="no"?>\n' + source;
+  const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `saldi_settoriali_${d3.select("#annoDisplay").text()}.svg`;
+  link.click();
+});
+
+// ==================== SCORCIATOIE TASTIERA ====================
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === "Space") { e.preventDefault(); timer ? pause() : play(); }
+  else if (e.key === "r" || e.key === "R") reset();
+  else if (e.key === "ArrowLeft") { pause(); goToAnno(anni[Math.max(0, currentFrame - 1)]); }
+  else if (e.key === "ArrowRight") { pause(); goToAnno(anni[Math.min(anni.length - 1, currentFrame + 1)]); }
+  else if (e.key === "Escape") resetIsolamento();
+});
+
+// ==================== HOVER ====================
+Object.keys(gruppi).forEach(paese => {
+  const annoCorrente = () => +d3.select("#annoDisplay").text();
+  [gruppi[paese].punto, gruppi[paese].halo].forEach(el => {
+    el.on("mouseover", (e) => showTooltip(e, paese, annoCorrente()))
+      .on("mousemove", (e) => showTooltip(e, paese, annoCorrente()))
+      .on("mouseout", hideTooltip);
+  });
+});
+
+// ==================== INIT ====================
+buildDataTable();
+buildConfronto();
+updateFrame(ANNO_INI, { animate: false });
+applyVisibility();
+</script>
+</body>
+</html>
