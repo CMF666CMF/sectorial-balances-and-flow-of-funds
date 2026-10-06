@@ -60,8 +60,43 @@
     color: var(--text-muted);
     line-height: 1.7;
     letter-spacing: 0.3px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
   }
   .header-right strong { color: var(--accent-gold); font-weight: 600; }
+
+  /* ============ LANGUAGE SWITCH ============ */
+  .lang-switch {
+    display: inline-flex;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .lang-switch button {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .lang-switch button.active {
+    background: var(--accent-gold);
+    color: var(--bg-deep);
+  }
+  .lang-switch button:hover:not(.active) {
+    color: var(--text-primary);
+  }
 
   /* ============ BADGE ISOLAMENTO ============ */
   .isolation-badge {
@@ -353,7 +388,6 @@
     font-weight: 700;
   }
 
-  /* ============ SPARKLINE ============ */
   .sparkline {
     display: inline-block;
     vertical-align: middle;
@@ -685,10 +719,20 @@
     opacity: 0.55;
   }
   .quadrant-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     letter-spacing: 0.5px;
-    opacity: 0.5;
+    opacity: 0.4;
+  }
+  .edge-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+  }
+  .edge-formula {
+    font-size: 10px;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    opacity: 0.85;
   }
   .paese-label {
     font-size: 11px;
@@ -737,34 +781,39 @@
 
   <header>
     <div class="header-left">
-      <h1>Saldi Settoriali e Flussi di Fondi</h1>
-      <div class="sub">Evoluzione macroeconomica 2007 – 2025 · Analisi comparata di sei economie</div>
+      <h1 id="title">Saldi Settoriali e Flussi di Fondi</h1>
+      <div class="sub" id="subtitle">Evoluzione macroeconomica 2007 – 2025 · Analisi comparata di sei economie</div>
     </div>
     <div class="header-right">
-      <strong>Identità contabile:</strong> (S − I) ≡ (T − G − TR) + CA<br>
-      <strong>Unità di misura:</strong> % del PIL<br>
-      <strong>Fonti:</strong> Eurostat · OECD · IMF WEO
+      <div class="lang-switch">
+        <button id="lang-it" class="active" onclick="setLang('it')">IT</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <div>
+        <strong id="hdr-identity">Identità contabile:</strong> <span id="hdr-formula">(S − I) ≡ (T − G − TR) + CA</span><br>
+        <strong id="hdr-unit">Unità di misura:</strong> <span id="hdr-unit-val">% del PIL</span><br>
+        <strong id="hdr-sources">Fonti:</strong> <span id="hdr-sources-val">Eurostat · OECD · IMF WEO</span>
+      </div>
     </div>
   </header>
 
   <div class="isolation-badge" id="isolationBadge">
-    <span style="font-weight:600;">Paesi isolati:</span>
+    <span style="font-weight:600;" id="iso-label">Paesi isolati:</span>
     <span class="chips" id="isoChips"></span>
-    <button onclick="resetIsolamento()">Mostra tutti</button>
+    <button onclick="resetIsolamento()" id="iso-reset">Mostra tutti</button>
   </div>
 
   <div class="layout">
 
-    <!-- ============ CHART PANEL ============ -->
     <div class="panel">
       <div class="controls">
-        <button id="playBtn" class="btn primary">▶ Play</button>
-        <button id="pauseBtn" class="btn" disabled>❚❚ Pausa</button>
+        <button id="playBtn" class="btn primary"><span id="btn-play-txt">▶ Play</span></button>
+        <button id="pauseBtn" class="btn" disabled><span id="btn-pause-txt">❚❚ Pausa</span></button>
         <button id="resetBtn" class="btn icon" title="Reset">↺</button>
         <button id="prevBtn" class="btn icon" title="Anno precedente">◀</button>
         <button id="nextBtn" class="btn icon" title="Anno successivo">▶</button>
         <div class="slider-wrap">
-          <label>Anno</label>
+          <label id="lbl-year">Anno</label>
           <input type="range" id="slider" min="2007" max="2025" value="2007" step="1">
         </div>
         <div class="anno-display" id="annoDisplay">2007</div>
@@ -776,78 +825,76 @@
         </div>
       </div>
 
-      <svg id="chart" viewBox="0 0 960 720" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="chart" viewBox="0 0 1000 780" preserveAspectRatio="xMidYMid meet"></svg>
 
       <div class="stats-bar">
         <div class="stat-cell">
-          <div class="stat-label">Media privato (S−I)</div>
+          <div class="stat-label" id="stat-lbl-priv">Media privato (S−I)</div>
           <div class="stat-value" id="statPriv">—</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-label">Media pubblico</div>
+          <div class="stat-label" id="stat-lbl-pub">Media pubblico</div>
           <div class="stat-value" id="statPub">—</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-label">Media estero (CA)</div>
+          <div class="stat-label" id="stat-lbl-est">Media estero (CA)</div>
           <div class="stat-value" id="statEst">—</div>
         </div>
       </div>
     </div>
 
-    <!-- ============ SIDEBAR ============ -->
     <div class="panel">
       <div class="panel-header">
-        <h2>Paesi</h2>
-        <span class="hint">click = isola · <strong style="color:var(--accent-gold)">Ctrl+click</strong> = multi</span>
+        <h2 id="sidebar-title">Paesi</h2>
+        <span class="hint" id="sidebar-hint">click = isola · <strong style="color:var(--accent-gold)">Ctrl+click</strong> = multi</span>
       </div>
       <div class="panel-body" style="padding: 10px;">
         <div id="paesiList"></div>
 
         <div class="formula-box">
-          <strong>Lettura del diagramma</strong>
+          <strong id="formula-box-title">Lettura del diagramma</strong>
           <span class="formula">S − I = CA − Pub</span>
-          La <strong>bisettrice</strong> rappresenta il pareggio del settore privato <em>(S = I)</em>.
-          La <strong>distanza verticale</strong> tra punto e bisettrice è pari al saldo privato.<br><br>
-          <strong>Sotto</strong> → surplus privato.<br>
-          <strong>Sopra</strong> → deficit privato.
+          <span id="formula-box-text">
+            La <strong>bisettrice</strong> rappresenta il pareggio del settore privato <em>(S = I)</em>.
+            La <strong>distanza verticale</strong> tra punto e bisettrice è pari al saldo privato.<br><br>
+            <strong>Sotto</strong> → surplus privato.<br>
+            <strong>Sopra</strong> → deficit privato.
+          </span>
         </div>
 
         <div class="kbd-hint">
-          <strong>Scorciatoie:</strong><br>
-          <kbd>Spazio</kbd> Play/Pausa · <kbd>R</kbd> Reset<br>
-          <kbd>←</kbd> <kbd>→</kbd> Cambia anno · <kbd>Esc</kbd> Reset isolamento<br>
-          <span class="highlight">Ctrl/Cmd + click</span> = isolamento multiplo
+          <strong id="kbd-title">Scorciatoie:</strong><br>
+          <kbd>Spazio</kbd> <span id="kbd-play">Play/Pausa</span> · <kbd>R</kbd> Reset<br>
+          <kbd>←</kbd> <kbd>→</kbd> <span id="kbd-year">Cambia anno</span> · <kbd>Esc</kbd> <span id="kbd-esc">Reset isolamento</span><br>
+          <span class="highlight">Ctrl/Cmd + click</span> = <span id="kbd-multi">isolamento multiplo</span>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- ============ CONFRONTO 2007 vs 2025 ============ -->
   <div class="panel" style="margin-top: 20px;">
     <div class="panel-header">
-      <h2>Confronto 2007 → 2025 · saldo privato (S − I)</h2>
-      <span class="hint">variazione in punti percentuali di PIL</span>
+      <h2 id="confronto-title">Confronto 2007 → 2025 · saldo privato (S − I)</h2>
+      <span class="hint" id="confronto-hint">variazione in punti percentuali di PIL</span>
     </div>
     <div class="panel-body" style="padding: 12px;">
       <div id="confrontoList"></div>
     </div>
   </div>
 
-  <!-- ============ DATA TABLE ============ -->
   <div class="panel" style="margin-top: 20px;">
     <div class="panel-header">
-      <h2>Dati agli anchor points · 2007 · 2010 · 2015 · 2020 · 2025</h2>
-      <span class="hint">% del PIL</span>
+      <h2 id="table-title">Dati agli anchor points · 2007 · 2010 · 2015 · 2020 · 2025</h2>
+      <span class="hint" id="table-hint">% del PIL</span>
     </div>
     <div class="panel-body" style="padding: 6px 12px 12px;">
       <table class="data-table" id="dataTable"></table>
     </div>
   </div>
 
-  <!-- ============ AUTHORS ============ -->
   <div class="authors-box">
-    <div class="authors-title">Gruppo di lavoro</div>
+    <div class="authors-title" id="authors-title">Gruppo di lavoro</div>
     <div class="authors-grid">
       <div class="author-row">
         <span class="author-name">Ciro Chierchia</span>
@@ -875,12 +922,12 @@
       </div>
     </div>
     <div class="authors-footer">
-      <span><strong>Corso:</strong> Macroeconomia · CLEA A-K · a.a. 2026/2027</span>
-      <span><strong>Elaborazione:</strong> D3.js · dati Eurostat · OECD · IMF WEO</span>
+      <span><strong id="authors-course">Corso:</strong> <span id="authors-course-val">Macroeconomia · CLEA A-K · a.a. 2026/2027</span></span>
+      <span><strong id="authors-tools">Elaborazione:</strong> D3.js · dati Eurostat · OECD · IMF WEO</span>
     </div>
   </div>
 
-  <footer>
+  <footer id="footer-text">
     Rappresentazione grafica dei saldi settoriali e flussi di fondi · Valori a 5 anchor points · 2007–2025
   </footer>
 
@@ -890,52 +937,156 @@
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-// ==================== DATI A 5 ANCHOR POINTS ====================
+// ==================== TRADUZIONI ====================
+const translations = {
+  it: {
+    title: "Saldi Settoriali e Flussi di Fondi",
+    subtitle: "Evoluzione macroeconomica 2007 – 2025 · Analisi comparata di sei economie",
+    hdrIdentity: "Identità contabile:",
+    hdrUnit: "Unità di misura:",
+    hdrUnitVal: "% del PIL",
+    hdrSources: "Fonti:",
+    isoLabel: "Paesi isolati:",
+    isoReset: "Mostra tutti",
+    btnPlay: "▶ Play",
+    btnPause: "❚❚ Pausa",
+    lblYear: "Anno",
+    statPriv: "Media privato (S−I)",
+    statPub: "Media pubblico",
+    statEst: "Media estero (CA)",
+    sidebarTitle: "Paesi",
+    sidebarHint: "click = isola · Ctrl+click = multi",
+    formulaBoxTitle: "Lettura del diagramma",
+    formulaBoxText: "La <strong>bisettrice</strong> rappresenta il pareggio del settore privato <em>(S = I)</em>. La <strong>distanza verticale</strong> tra punto e bisettrice è pari al saldo privato.<br><br><strong>Sotto</strong> → surplus privato.<br><strong>Sopra</strong> → deficit privato.",
+    kbdTitle: "Scorciatoie:",
+    kbdPlay: "Play/Pausa",
+    kbdYear: "Cambia anno",
+    kbdEsc: "Reset isolamento",
+    kbdMulti: "isolamento multiplo",
+    confrontoTitle: "Confronto 2007 → 2025 · saldo privato (S − I)",
+    confrontoHint: "variazione in punti percentuali di PIL",
+    tableTitle: "Dati agli anchor points · 2007 · 2010 · 2015 · 2020 · 2025",
+    tableHint: "% del PIL",
+    authorsTitle: "Gruppo di lavoro",
+    authorsCourse: "Corso:",
+    authorsCourseVal: "Macroeconomia · CLEA A-K · a.a. 2026/2027",
+    authorsTools: "Elaborazione:",
+    footer: "Rappresentazione grafica dei saldi settoriali e flussi di fondi · Valori a 5 anchor points · 2007–2025",
+    axisX: "Saldo estero corrente (CA = NX + RNE) — % del PIL",
+    axisY: "Saldo pubblico primario (T − G − TR) — % del PIL",
+    edgeTop: "AVANZO PUBBLICO",
+    edgeTopFormula: "[TA − (G + TR)] > 0",
+    edgeBottom: "DISAVANZO PUBBLICO",
+    edgeBottomFormula: "[TA − (G + TR)] < 0",
+    edgeRight: "AVANZO ESTERO",
+    edgeRightFormula: "NX + RNE > 0",
+    edgeLeft: "DISAVANZO ESTERO",
+    edgeLeftFormula: "NX + RNE < 0",
+    ttCA: "Saldo estero (CA)",
+    ttPub: "Saldo pubblico",
+    ttPriv: "Saldo privato (S−I)",
+    ttCA2: "CA",
+    ttPub2: "Pub",
+    ttPriv2: "S−I",
+    tblCountry: "Paese",
+    confrontoDelta: "Δ"
+  },
+  en: {
+    title: "Sectoral Balances and Flow of Funds",
+    subtitle: "Macroeconomic evolution 2007 – 2025 · Comparative analysis of six economies",
+    hdrIdentity: "Accounting identity:",
+    hdrUnit: "Unit:",
+    hdrUnitVal: "% of GDP",
+    hdrSources: "Sources:",
+    isoLabel: "Isolated countries:",
+    isoReset: "Show all",
+    btnPlay: "▶ Play",
+    btnPause: "❚❚ Pause",
+    lblYear: "Year",
+    statPriv: "Private avg (S−I)",
+    statPub: "Public avg",
+    statEst: "External avg (CA)",
+    sidebarTitle: "Countries",
+    sidebarHint: "click = isolate · Ctrl+click = multi",
+    formulaBoxTitle: "Reading the diagram",
+    formulaBoxText: "The <strong>bisector</strong> represents the private sector balance <em>(S = I)</em>. The <strong>vertical distance</strong> between point and bisector equals the private balance.<br><br><strong>Below</strong> → private surplus.<br><strong>Above</strong> → private deficit.",
+    kbdTitle: "Shortcuts:",
+    kbdPlay: "Play/Pause",
+    kbdYear: "Change year",
+    kbdEsc: "Reset isolation",
+    kbdMulti: "multi isolation",
+    confrontoTitle: "Comparison 2007 → 2025 · private balance (S − I)",
+    confrontoHint: "change in percentage points of GDP",
+    tableTitle: "Data at anchor points · 2007 · 2010 · 2015 · 2020 · 2025",
+    tableHint: "% of GDP",
+    authorsTitle: "Working group",
+    authorsCourse: "Course:",
+    authorsCourseVal: "Macroeconomics · CLEA A-K · a.y. 2026/2027",
+    authorsTools: "Tools:",
+    footer: "Graphical representation of sectoral balances and flow of funds · Values at 5 anchor points · 2007–2025",
+    axisX: "Current account balance (CA = NX + RNE) — % of GDP",
+    axisY: "Primary public balance (T − G − TR) — % of GDP",
+    edgeTop: "FISCAL SURPLUS",
+    edgeTopFormula: "[TA − (G + TR)] > 0",
+    edgeBottom: "FISCAL DEFICIT",
+    edgeBottomFormula: "[TA − (G + TR)] < 0",
+    edgeRight: "EXTERNAL SURPLUS",
+    edgeRightFormula: "NX + RNE > 0",
+    edgeLeft: "EXTERNAL DEFICIT",
+    edgeLeftFormula: "NX + RNE < 0",
+    ttCA: "External balance (CA)",
+    ttPub: "Public balance",
+    ttPriv: "Private balance (S−I)",
+    ttCA2: "CA",
+    ttPub2: "Pub",
+    ttPriv2: "S−I",
+    tblCountry: "Country",
+    confrontoDelta: "Δ"
+  }
+};
+
+let currentLang = 'it';
+function t(key) { return translations[currentLang][key] || key; }
+
+// ==================== DATI ====================
 const anchorYears = [2007, 2010, 2015, 2020, 2025];
 
 const datiReali = {
   "Italia": {
     CA:  { 2007: -1.5, 2010: -3.4, 2015:  1.6, 2020:  3.9, 2025:  1.2 },
     Pub: { 2007: -1.5, 2010: -3.6, 2015: -2.6, 2020: -6.1, 2025: -3.1 },
-    color: "#5b9bd5",
-    nota: "Passaggio da fragile posizione esterna a surplus privato robusto. Il deficit pubblico primario resta contenuto entro il 3%."
+    color: "#5b9bd5"
   },
   "USA": {
     CA:  { 2007: -5.1, 2010: -2.9, 2015: -2.2, 2020: -2.8, 2025: -3.6 },
     Pub: { 2007: -1.1, 2010: -8.6, 2015: -2.4, 2020: -14.7, 2025: -5.9 },
-    color: "#e05252",
-    nota: "Deficit gemelli persistenti. Il settore privato è tornato in surplus dopo il deleveraging 2008–2012, ma il deficit pubblico è esploso. Dati 2007-2020 da OMB; 2025 da Tesoro USA."
+    color: "#e05252"
   },
   "Lussemburgo": {
     CA:  { 2007:  9.0, 2010:  5.5, 2015:  4.7, 2020:  4.9, 2025:  4.3 },
     Pub: { 2007:  4.0, 2010:  1.5, 2015:  0.8, 2020: -1.5, 2025: -1.0 },
-    color: "#b197fc",
-    nota: "Hub contabile e finanziario. Il surplus estero riflette i flussi delle multinazionali e dei fondi di investimento, non la produzione reale."
+    color: "#b197fc"
   },
   "Norvegia": {
     CA:  { 2007: 13.5, 2010: 12.3, 2015:  8.5, 2020:  2.1, 2025: 14.8 },
     Pub: { 2007: 17.3, 2010: 11.0, 2015:  5.9, 2020: -1.8, 2025: 12.0 },
-    color: "#4db87a",
-    nota: "Fondo sovrano (Government Pension Fund Global). Surplus estero strutturale legato alle materie prime energetiche."
+    color: "#4db87a"
   },
   "Irlanda": {
     CA:  { 2007: -6.5, 2010: -1.2, 2015:  4.2, 2020:  4.4, 2025:  8.2 },
     Pub: { 2007:  0.0, 2010: -9.9, 2015: -1.7, 2020: -5.0, 2025:  1.8 },
-    color: "#e8a33d",
-    nota: "Hub contabile. Il rimbalzo è dovuto in gran parte alle multinazionali (pharma, tech) che spostano utili e proprietà intellettuale in Irlanda."
+    color: "#e8a33d"
   },
   "Cina": {
     CA:  { 2007: 10.1, 2010:  4.0, 2015:  2.7, 2020:  1.7, 2025:  3.3 },
     Pub: { 2007:  1.0, 2010: -2.3, 2015: -3.4, 2020: -6.2, 2025: -8.7 },
-    color: "#e07be0",
-    nota: "Risparmio interno elevato. Il surplus estero si è ridotto per transizione verso consumi interni e tensioni commerciali; il deficit pubblico è cresciuto."
+    color: "#e07be0"
   }
 };
 
 const anni = d3.range(2007, 2026);
 const ANNO_INI = 2007, ANNO_FIN = 2025;
 
-// Interpolazione a anchor points
 function interpReale(valori, anno) {
   const punti = Object.entries(valori)
     .map(([a, v]) => ({ anno: +a, val: v }))
@@ -957,12 +1108,12 @@ function getCA(p, a)  { return interpReale(datiReali[p].CA, a); }
 function getPub(p, a) { return interpReale(datiReali[p].Pub, a); }
 function getPriv(p, a){ return getCA(p, a) - getPub(p, a); }
 
-// ==================== STATO ISOLAMENTO ====================
 const isolatedSet = new Set();
 
 // ==================== SETUP SVG ====================
-const width = 960, height = 720;
-const margin = { top: 50, right: 50, bottom: 75, left: 85 };
+const width = 1000, height = 780;
+// Margin sinistro ampliato per dare spazio all'etichetta dell'asse Y
+const margin = { top: 100, right: 150, bottom: 130, left: 180 };
 const innerW = width - margin.left - margin.right;
 const innerH = height - margin.top - margin.bottom;
 
@@ -976,6 +1127,8 @@ const yScale = d3.scaleLinear().domain([-12, 20]).range([innerH, 0]);
 g.append("rect")
   .attr("width", innerW).attr("height", innerH)
   .attr("fill", "rgba(255,255,255,0.012)")
+  .attr("stroke", "rgba(143,163,192,0.15)")
+  .attr("stroke-width", 1)
   .attr("rx", 4);
 
 // --- Zone colorate ---
@@ -1029,12 +1182,12 @@ g.append("text")
   .attr("opacity", 0.75)
   .text("S = I");
 
-// --- Etichette quadranti ---
+// --- Etichette quadranti INTERNE (piccole, ai bordi estremi) ---
 const quadLabels = [
-  { x: xScale(19), y: yScale(19),   text: "AVANZO ESTERO · AVANZO PUBBLICO", color: "#4db87a", anchor: "end" },
-  { x: xScale(-11), y: yScale(19),   text: "DISAVANZO ESTERO · AVANZO PUBBLICO", color: "#8fa3c0", anchor: "start" },
-  { x: xScale(-11), y: yScale(-11),  text: "DISAVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e05252", anchor: "start" },
-  { x: xScale(19), y: yScale(-11),  text: "AVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e8a33d", anchor: "end" }
+  { x: xScale(19.5), y: yScale(19.5),   text: "AVANZO ESTERO · AVANZO PUBBLICO", color: "#4db87a", anchor: "end" },
+  { x: xScale(-11.5), y: yScale(19.5),  text: "DISAVANZO ESTERO · AVANZO PUBBLICO", color: "#8fa3c0", anchor: "start" },
+  { x: xScale(-11.5), y: yScale(-11.5), text: "DISAVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e05252", anchor: "start" },
+  { x: xScale(19.5), y: yScale(-11.5),  text: "AVANZO ESTERO · DISAVANZO PUBBLICO", color: "#e8a33d", anchor: "end" }
 ];
 quadLabels.forEach(q => {
   g.append("text")
@@ -1045,17 +1198,64 @@ quadLabels.forEach(q => {
     .text(q.text);
 });
 
-// --- Etichette assi ---
-g.append("text")
-  .attr("x", innerW / 2).attr("y", innerH + 52)
-  .attr("text-anchor", "middle").attr("class", "axis-title")
-  .text("Saldo estero corrente (CA = NX + RNE) — % del PIL");
+// --- Etichette estremi assi (FUORI dal riquadro) ---
 
-g.append("text")
-  .attr("transform", "rotate(-90)")
-  .attr("x", -innerH / 2).attr("y", -62)
+// TOP: Fiscal surplus
+g.append("text").attr("class", "edge-label").attr("id", "edge-top")
+  .attr("x", innerW / 2).attr("y", -55)
+  .attr("text-anchor", "middle").attr("fill", "#4db87a")
+  .text(t('edgeTop'));
+
+g.append("text").attr("class", "edge-formula").attr("id", "edge-top-formula")
+  .attr("x", innerW / 2).attr("y", -40)
+  .attr("text-anchor", "middle").attr("fill", "#4db87a")
+  .text(t('edgeTopFormula'));
+
+// BOTTOM: Fiscal deficit
+g.append("text").attr("class", "edge-label").attr("id", "edge-bottom")
+  .attr("x", innerW / 2).attr("y", innerH + 30)
+  .attr("text-anchor", "middle").attr("fill", "#e05252")
+  .text(t('edgeBottom'));
+
+g.append("text").attr("class", "edge-formula").attr("id", "edge-bottom-formula")
+  .attr("x", innerW / 2).attr("y", innerH + 45)
+  .attr("text-anchor", "middle").attr("fill", "#e05252")
+  .text(t('edgeBottomFormula'));
+
+// RIGHT: External surplus
+g.append("text").attr("class", "edge-label").attr("id", "edge-right")
+  .attr("x", innerW + 15).attr("y", innerH / 2 - 6)
+  .attr("text-anchor", "start").attr("fill", "#4db87a")
+  .text(t('edgeRight'));
+
+g.append("text").attr("class", "edge-formula").attr("id", "edge-right-formula")
+  .attr("x", innerW + 15).attr("y", innerH / 2 + 8)
+  .attr("text-anchor", "start").attr("fill", "#4db87a")
+  .text(t('edgeRightFormula'));
+
+// LEFT: External deficit (spostato più in alto per non toccare l'etichetta dell'asse Y)
+g.append("text").attr("class", "edge-label").attr("id", "edge-left")
+  .attr("x", -15).attr("y", innerH / 2 - 50)
+  .attr("text-anchor", "end").attr("fill", "#e05252")
+  .text(t('edgeLeft'));
+
+g.append("text").attr("class", "edge-formula").attr("id", "edge-left-formula")
+  .attr("x", -15).attr("y", innerH / 2 - 36)
+  .attr("text-anchor", "end").attr("fill", "#e05252")
+  .text(t('edgeLeftFormula'));
+
+// --- Etichette assi (sotto/sinistra, oltre gli estremi) ---
+g.append("text").attr("id", "axis-x-title")
+  .attr("x", innerW / 2).attr("y", innerH + 80)
   .attr("text-anchor", "middle").attr("class", "axis-title")
-  .text("Saldo pubblico primario (T − G − TR) — % del PIL");
+  .text(t('axisX'));
+
+// Etichetta asse Y spostata più a sinistra (y = -150 invece di -110)
+g.append("text").attr("id", "axis-y-title")
+  .attr("transform", "rotate(-90)")
+  .attr("x", -innerH / 2).attr("y", -150)
+  .attr("text-anchor", "middle").attr("class", "axis-title")
+  .text(t('axisY'));
 
 // --- Tick assi ---
 const xAxis = g.append("g")
@@ -1165,15 +1365,15 @@ function showTooltip(event, paese, anno) {
       <span class="tooltip-year">${anno}</span>
     </div>
     <div class="tooltip-row">
-      <span class="label">Saldo estero (CA)</span>
+      <span class="label">${t('ttCA')}</span>
       <span class="value" style="color:${col(ca)}">${fmt(ca)}</span>
     </div>
     <div class="tooltip-row">
-      <span class="label">Saldo pubblico</span>
+      <span class="label">${t('ttPub')}</span>
       <span class="value" style="color:${col(pub)}">${fmt(pub)}</span>
     </div>
     <div class="tooltip-row highlight">
-      <span class="label">Saldo privato (S−I)</span>
+      <span class="label">${t('ttPriv')}</span>
       <span class="value" style="color:${col(priv)}">${fmt(priv)}</span>
     </div>
   `)
@@ -1228,12 +1428,11 @@ Object.keys(datiReali).forEach(paese => {
   row.on("dblclick", () => resetIsolamento());
 });
 
-// ==================== ISOLAMENTO MULTIPLO ====================
+// ==================== ISOLAMENTO ====================
 function applyVisibility() {
   const hasIsolation = isolatedSet.size > 0;
 
   Object.keys(gruppi).forEach(p => {
-    const gr = gruppi[p];
     const sel = d3.select(`.paese-grp[data-paese="${p}"]`);
     const isIsolated = isolatedSet.has(p);
 
@@ -1248,8 +1447,7 @@ function applyVisibility() {
       sel.style("pointer-events", "none");
     }
 
-    d3.select(`.legend-item[data-paese="${p}"]`)
-      .classed("isolated", isIsolated);
+    d3.select(`.legend-item[data-paese="${p}"]`).classed("isolated", isIsolated);
   });
 
   const badge = d3.select("#isolationBadge");
@@ -1301,18 +1499,15 @@ function updateSidebar(anno) {
     const cls = v => v >= 0 ? 'val-pos' : 'val-neg';
     const sign = v => (v >= 0 ? '+' : '') + v.toFixed(1);
     d3.select(`#val-${paese.replace(/\s/g,'')}`).html(`
-      CA <span class="${cls(ca)}">${sign(ca)}</span> ·
-      Pub <span class="${cls(pub)}">${sign(pub)}</span><br>
-      <span class="val-priv">S−I ${sign(priv)}</span>
+      ${t('ttCA2')} <span class="${cls(ca)}">${sign(ca)}</span> ·
+      ${t('ttPub2')} <span class="${cls(pub)}">${sign(pub)}</span><br>
+      <span class="val-priv">${t('ttPriv2')} ${sign(priv)}</span>
     `);
   });
 }
 
 function updateStats(anno) {
-  const attivi = isolatedSet.size > 0
-    ? Array.from(isolatedSet)
-    : Object.keys(datiReali);
-
+  const attivi = isolatedSet.size > 0 ? Array.from(isolatedSet) : Object.keys(datiReali);
   let sumPriv = 0, sumPub = 0, sumEst = 0;
   attivi.forEach(p => {
     sumPriv += getPriv(p, anno);
@@ -1327,7 +1522,6 @@ function updateStats(anno) {
   d3.select("#statEst").text(fmt(sumEst)).style("color", col(sumEst));
 }
 
-// ANIMAZIONE
 function updateFrame(anno, { animate = false, progress = true } = {}) {
   d3.select("#annoDisplay").text(anno);
   d3.select("#slider").property("value", anno);
@@ -1389,11 +1583,12 @@ function updateFrame(anno, { animate = false, progress = true } = {}) {
 // ==================== TABELLA ====================
 function buildDataTable() {
   const table = d3.select("#dataTable");
+  table.html("");
   const paesi = Object.keys(datiReali);
 
   const thead = table.append("thead");
   const headerRow = thead.append("tr");
-  headerRow.append("th").text("Paese");
+  headerRow.append("th").text(t('tblCountry'));
   anchorYears.forEach(anno => {
     headerRow.append("th").attr("colspan", 3).text(anno)
       .attr("data-anno", anno)
@@ -1403,9 +1598,9 @@ function buildDataTable() {
   const subRow = thead.append("tr");
   subRow.append("th").text("");
   anchorYears.forEach(() => {
-    subRow.append("th").text("CA").style("text-align", "right");
-    subRow.append("th").text("Pub").style("text-align", "right");
-    subRow.append("th").text("S−I").style("text-align", "right");
+    subRow.append("th").text(t('ttCA2')).style("text-align", "right");
+    subRow.append("th").text(t('ttPub2')).style("text-align", "right");
+    subRow.append("th").text(t('ttPriv2')).style("text-align", "right");
   });
 
   const tbody = table.append("tbody");
@@ -1442,6 +1637,7 @@ function highlightTableYear(anno) {
 // ==================== CONFRONTO ====================
 function buildConfronto() {
   const list = d3.select("#confrontoList");
+  list.html("");
   Object.keys(datiReali).forEach(paese => {
     const p2007 = getPriv(paese, 2007);
     const p2025 = getPriv(paese, 2025);
@@ -1457,7 +1653,7 @@ function buildConfronto() {
     row.append("div").attr("class", "confronto-values")
       .html(`
         <span class="confronto-val ${cls(p2007)}">${sign(p2007)}</span>
-        <span class="confronto-delta">Δ ${sign(delta)}</span>
+        <span class="confronto-delta">${t('confrontoDelta')} ${sign(delta)}</span>
         <span class="confronto-val ${cls(p2025)}">${sign(p2025)}</span>
       `);
   });
@@ -1475,14 +1671,10 @@ function play() {
 
   if (currentFrame >= anni.length - 1) {
     currentFrame = 0;
-    Object.keys(gruppi).forEach(p => {
-      gruppi[p].traccia.attr("d", null);
-    });
+    Object.keys(gruppi).forEach(p => gruppi[p].traccia.attr("d", null));
   }
 
-  Object.keys(gruppi).forEach(p => {
-    gruppi[p].pulseRing.attr("opacity", 0.6);
-  });
+  Object.keys(gruppi).forEach(p => gruppi[p].pulseRing.attr("opacity", 0.6));
 
   timer = setInterval(() => {
     if (currentFrame >= anni.length - 1) { pause(); return; }
@@ -1495,9 +1687,7 @@ function pause() {
   if (timer) { clearInterval(timer); timer = null; }
   d3.select("#playBtn").attr("disabled", null);
   d3.select("#pauseBtn").attr("disabled", true);
-  Object.keys(gruppi).forEach(p => {
-    gruppi[p].pulseRing.attr("opacity", 0);
-  });
+  Object.keys(gruppi).forEach(p => gruppi[p].pulseRing.attr("opacity", 0));
 }
 
 function goToAnno(anno, animate = false) {
@@ -1564,6 +1754,63 @@ Object.keys(gruppi).forEach(paese => {
       .on("mouseout", hideTooltip);
   });
 });
+
+// ==================== CAMBIO LINGUA ====================
+function setLang(lang) {
+  currentLang = lang;
+
+  d3.select("#lang-it").classed("active", lang === 'it');
+  d3.select("#lang-en").classed("active", lang === 'en');
+
+  d3.select("#title").text(t('title'));
+  d3.select("#subtitle").text(t('subtitle'));
+  d3.select("#hdr-identity").text(t('hdrIdentity'));
+  d3.select("#hdr-unit").text(t('hdrUnit'));
+  d3.select("#hdr-unit-val").text(t('hdrUnitVal'));
+  d3.select("#hdr-sources").text(t('hdrSources'));
+  d3.select("#iso-label").text(t('isoLabel'));
+  d3.select("#iso-reset").text(t('isoReset'));
+  d3.select("#btn-play-txt").text(t('btnPlay'));
+  d3.select("#btn-pause-txt").text(t('btnPause'));
+  d3.select("#lbl-year").text(t('lblYear'));
+  d3.select("#stat-lbl-priv").text(t('statPriv'));
+  d3.select("#stat-lbl-pub").text(t('statPub'));
+  d3.select("#stat-lbl-est").text(t('statEst'));
+  d3.select("#sidebar-title").text(t('sidebarTitle'));
+  d3.select("#sidebar-hint").html(t('sidebarHint').replace("Ctrl+click", '<strong style="color:var(--accent-gold)">Ctrl+click</strong>'));
+  d3.select("#formula-box-title").text(t('formulaBoxTitle'));
+  d3.select("#formula-box-text").html(t('formulaBoxText'));
+  d3.select("#kbd-title").text(t('kbdTitle'));
+  d3.select("#kbd-play").text(t('kbdPlay'));
+  d3.select("#kbd-year").text(t('kbdYear'));
+  d3.select("#kbd-esc").text(t('kbdEsc'));
+  d3.select("#kbd-multi").text(t('kbdMulti'));
+  d3.select("#confronto-title").text(t('confrontoTitle'));
+  d3.select("#confronto-hint").text(t('confrontoHint'));
+  d3.select("#table-title").text(t('tableTitle'));
+  d3.select("#table-hint").text(t('tableHint'));
+  d3.select("#authors-title").text(t('authorsTitle'));
+  d3.select("#authors-course").text(t('authorsCourse'));
+  d3.select("#authors-course-val").text(t('authorsCourseVal'));
+  d3.select("#authors-tools").text(t('authorsTools'));
+  d3.select("#footer-text").text(t('footer'));
+
+  // Etichette SVG
+  d3.select("#axis-x-title").text(t('axisX'));
+  d3.select("#axis-y-title").text(t('axisY'));
+  d3.select("#edge-top").text(t('edgeTop'));
+  d3.select("#edge-top-formula").text(t('edgeTopFormula'));
+  d3.select("#edge-bottom").text(t('edgeBottom'));
+  d3.select("#edge-bottom-formula").text(t('edgeBottomFormula'));
+  d3.select("#edge-right").text(t('edgeRight'));
+  d3.select("#edge-right-formula").text(t('edgeRightFormula'));
+  d3.select("#edge-left").text(t('edgeLeft'));
+  d3.select("#edge-left-formula").text(t('edgeLeftFormula'));
+
+  buildDataTable();
+  buildConfronto();
+  updateSidebar(+d3.select("#annoDisplay").text());
+}
 
 // ==================== INIT ====================
 buildDataTable();
